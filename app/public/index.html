@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal LAN Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Personal LAN Chat</h1>
+        <div class="messages" id="messages">
+            <!-- Messages will be loaded here by JavaScript -->
+        </div>
+        <div class="input-area">
+            <input type="text" id="usernameInput" placeholder="Your Name" value="Anonymous">
+            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>

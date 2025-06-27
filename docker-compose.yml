@@ -1,0 +1,16 @@
+services:
+  lan-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lan-chat-app
+    ports:
+      - "3000:3000"
+    volumes: 
+      - chat_data:/data
+    environment:
+      - PORT=3000
+      - DB_PATH=/data/chat.db
+
+volumes:
+  chat_data:

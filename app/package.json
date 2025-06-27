@@ -1,0 +1,24 @@
+{
+  "name": "lan-chat-app",
+  "version": "1.0.0",
+  "description": "A simple, self-hosted LAN chat application.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "lan",
+    "chat",
+    "self-hosted",
+    "docker",
+    "nodejs",
+    "websocket"
+  ],
+  "author": "Nathan Thurber",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}
