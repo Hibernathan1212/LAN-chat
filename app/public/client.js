@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const usernameInput = document.getElementById('usernameInput');
   const messageInput = document.getElementById('messageInput');
   const sendButton = document.getElementById('sendButton');
+  const connectedUsersList = document.getElementById('connectedUsersList');
 
   const socket = new WebSocket(`ws://${window.location.host}`);
 
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message');
+    messageElement.setAttribute('data-message-id', message.id);
     
     const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
       hour: '2-digit',
@@ -18,14 +20,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     messageElement.innerHTML = `
-      <span class="username">${escapeHTML(message.username)}:</span>
-      <span class="content">${escapeHTML(message.message)}</span>
+      <div class="message-content-wrapper">
+        <span class="username">${escapeHTML(message.username)}</span>
+        <span class="ip-address">(${escapeHTML(message.ip)})</span>:
+        <span class="content">${escapeHTML(message.message)}</span>
+      </div>
       <span class="timestamp">${timestamp}</span>
+      <button class="delete-btn" data-id="${message.id}">🗑️</button>
     `;
 
     messagesDiv.appendChild(messageElement);
 
+    messageElement.querySelector('.delete-btn').addEventListener('click', (event) => {
+      const messageId = event.currentTarget.getAttribute('data-id');
+      if (confirm('Are you sure you want to delete this message?')) {
+        socket.send(JSON.stringify({ type: 'deleteMessage', id: parseInt(messageId) }));
+      }
+    });
+
     messagesDiv.scrollTop = messagesDiv.scrollHeight; //scroll to bottom
+  }
+
+  function removeMessageElement(id) {
+    const messageElement = messagesDiv.querySelector(`[data-message-id="${id}"]`);
+    if (messageElement) {
+      messageElement.remove();
+    }
   }
 
   function escapeHTML(str) { //prevents cross site scripting
@@ -33,6 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   }
+
+  function updateConnectedUsers(users) {
+    connectedUsersList.innerHTML = '';
+    users.forEach(user => {
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <span class="user-name">${escapeHTML(user.username)}</span>
+        <span class="user-ip">(${escapeHTML(user.ip)})</span>
+      `;
+      connectedUsersList.appendChild(listItem);
+    })
+    console.log('test');
+  }
+
 
   socket.onopen = (event) => {
     console.log('WebSocket connected');
@@ -43,11 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(event.data);
 
     if (data.type === 'history') {
+      messagesDiv.innerHTML = '';
       data.messages.forEach(displayMessage);
       console.log('Received message history');
+
     } else if (data.type === 'newMessage') {
       displayMessage(data.message);
       console.log('Received new message:', data.message);
+
+    } else if (data.type === 'messageDeleted') {
+      removeMessageElement(data.id);
+      console.log('Message deleted:', data.id);
+
+    } else if (data.type === 'connectedUsers') {
+      updateConnectedUsers(data.users);
+      console.log('Updated connected users:', data.users);
     }
   }
 
@@ -76,11 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       messageInput.value = '';
 
-      usernameInput.setAttribute('readonly', true); // Lock username after first send
-      usernameInput.style.backgroundColor = '#e9ecef';
-      usernameInput.style.cursor = 'not-allowed';
-
-
+      if (!usernameInput.readOnly) {
+        usernameInput.setAttribute('readonly', true);
+        usernameInput.style.color = '#e9ecef';
+        usernameInput.style.cursor = 'not-allowed';
+      }
     }
   }
 

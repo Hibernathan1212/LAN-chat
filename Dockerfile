@@ -15,8 +15,8 @@ RUN apk add --no-cache python3 make g++
 # Copy package.json and package-lock.json first to leverage Docker cache
 COPY app/package*.json ./
 
-# Install dependencies (better-sqlite3 will now compile successfully)
-RUN npm install
+# Install dependencies
+RUN npm ci --omit=dev
 
 # Copy the rest of the application code
 COPY app/ .
