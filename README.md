@@ -24,7 +24,7 @@ This method simplifies building and running your container with persistent stora
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/lan-chat.git
+    git clone https://github.com/hibernathan1212/lan-chat.git
     cd lan-chat
     ```
 2.  **Build and run the container:**
